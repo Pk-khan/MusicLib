@@ -1,0 +1,50 @@
+<%- include('./partial/header.ejs'); %>
+
+    <h1 class="display-6 center whiteColor">
+        My History
+    </h1>
+    <br/>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 center">
+
+                <table class="table whiteColor">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Song Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if( historySongs && historySongs.songs.length > 0) {
+                                var pos = 0;
+                            %>
+
+                            <% for(var i = historySongs.songs.length-1; i >=0 ; i--, pos++)  {%>
+
+                                <tr>
+                                    <th scope="row">
+                                        <%= pos+1 %>
+                                    </th>
+
+                                    <td>
+                                        <button style=" background:none;border:none;color:#007bff;" class="link fs-4" onclick="fetchSong('<%= historySongs.songs[i]._id %>')">
+                                        <%= historySongs.songs[i].name %>
+                                    </button>
+                                    </td>
+
+                                </tr>
+                                <% } %>
+                                    <% } %>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <br/><br/><br/>
+
+
+
+    <%- include('./partial/footer.ejs'); %>

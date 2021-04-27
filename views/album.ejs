@@ -1,0 +1,120 @@
+<%- include('./partial/header.ejs'); %>
+
+
+    <h1 class="display-6 center whiteColor">
+        <%= data.text %>
+    </h1>
+
+    <br/>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 center " style=" margin-left:5%">
+
+                <% for(var i = 0; i<data.album.length; i++)  {   %>
+                    <div class="card-body albumcardView" style="margin-left:4% ">
+
+                        <p class="fs-5" style="color:rgb(255, 217, 0)">
+                            <%= data.album[i].name %>
+                        </p>
+                        <p class="fs-6">
+                            <%= data.album[i].artist.name %>
+                        </p>
+                        <a href='/album/<%= data.album[i]._id%>'><i class="fas fa-play-circle fs-1"></i></a>
+                        <br/><br/>
+                        <% if ( data.text.localeCompare('My Albums') == 0 ) { %>
+
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" onclick="renameAlbum('<%= data.album[i]._id %>')">
+                                    <span style="vertical-align: bottom;" class="material-icons">
+                                       drive_file_rename_outline
+                                   </span> Rename
+                            </button>
+
+                            <% } %>
+
+                    </div>
+                    <% } %>
+
+
+            </div>
+        </div>
+    </div>
+
+    <br/><br/><br/>
+
+
+
+
+    <div class="modal fade" id="RenameAlbum" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rename Album</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="playlist" class="col-form-label">Album New Name:</label>
+                            <input type="text" class="form-control" id="newName" placeholder="Enter here" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="renameThisAlbum()">Rename</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var albumId;
+        var albumNewName
+        async function renameAlbum(id) {
+            $('#RenameAlbum').modal('show');
+            albumId = id;
+        }
+
+        async function renameThisAlbum() {
+            var albumNewName = document.getElementById("newName").value;
+            $('#RenameAlbum').modal('hide');
+
+            var data = {
+                albumId,
+                albumNewName,
+            }
+
+            options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */ *',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+
+            let res = '';
+            try {
+                res = await fetch('/album/renameAlbum', options);
+                res = await res.json();
+                resultMessage.innerHTML = res.msg;
+                console.log(res);
+            } catch (ex) {
+                console.log(ex);
+                resultMessage.innerHTML = ex;
+            }
+
+            playlistId = null;
+
+            setTimeout(function() {
+                location.assign('/album');
+            }, 1000);
+
+        }
+    </script>
+
+
+    <%- include('./partial/footer.ejs'); %>

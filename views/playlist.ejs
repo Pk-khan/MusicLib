@@ -1,0 +1,272 @@
+<%- include('./partial/header.ejs'); %>
+
+    <h1 class="display-6 center whiteColor">
+        My Playlists
+    </h1>
+
+    <div class="modal fade" id="createPlaylist" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Playlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="playlist" class="col-form-label">Playlist Name:</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter here" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="createPlaylist()">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap Model for Deleting playlist -->
+    <div class="modal fade" id="deletePlaylist" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Playlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure to Delete this playlist
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteThisPlaylist()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap Model for Renaming playlist -->
+    <div class="modal fade" id="RenamePlaylist" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rename Playlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="playlist" class="col-form-label">Playlist New Name:</label>
+                            <input type="text" class="form-control" id="newName" placeholder="Enter here" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="renameThisPlaylist()">Rename</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <br/>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 center">
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#createPlaylist"> <span style="vertical-align: bottom;" class="material-icons">
+                    add
+                    </span> Create New Playlist</button>
+                <br/><br/>
+
+                <table class="table whiteColor">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Playlist Name</th>
+                            <th scope="col">Playlist Rename</th>
+                            <th scope="col">Playlist Delete</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <% for(var i = 0; i<data.allPlaylist.length; i++)  {%>
+
+                            <tr>
+                                <th scope="row">
+                                    <%= i+1 %>
+                                </th>
+                                <td>
+                                    <a href='playlist/<%= data.allPlaylist[i]._id%>' class="noUnderline fs-4">
+                                        <%= data.allPlaylist[i].name %>
+                                    </a>
+                                </td>
+                                <td>
+
+                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" onclick="renamePlaylist('<%= data.allPlaylist[i]._id %>')">
+                                         <span style="vertical-align: bottom;" class="material-icons">
+                                            drive_file_rename_outline
+                                        </span> Rename
+                                    </button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" onclick="deletePlaylist('<%= data.allPlaylist[i]._id %>')">
+                                        <span class="material-icons verticalSpanIcon">
+                                            delete
+                                            </span> Delete
+                                      </button>
+                                </td>
+                            </tr>
+
+                            <% } %>
+
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+    <br/><br/><br/>
+
+
+
+    <script>
+        var playlistId;
+        resultMessage = document.getElementById("resultMessage");
+
+        async function deletePlaylist(id) {
+            $('#deletePlaylist').modal('show');
+            playlistId = id;
+        }
+
+        async function renamePlaylist(id) {
+            $('#RenamePlaylist').modal('show');
+            playlistId = id;
+        }
+
+        async function deleteThisPlaylist() {
+
+            $('#deletePlaylist').modal('hide');
+
+
+            var data = {
+                playlistId
+            }
+
+            options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */ *',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+
+            let res = '';
+            try {
+                res = await fetch('/playlist/deletePlaylist', options);
+                res = await res.json();
+                resultMessage.innerHTML = res.msg;
+                console.log(res);
+            } catch (ex) {
+                console.log(ex);
+                resultMessage.innerHTML = ex;
+            }
+
+            playlistId = null;
+
+            setTimeout(function() {
+                location.assign('/playlist');
+            }, 1000);
+
+
+        }
+
+        async function createPlaylist() {
+            var model = document.getElementById('createPlaylist');
+            var name = document.getElementById("name").value;
+
+            $('#createPlaylist').modal('hide');
+
+            var data = {
+                name,
+            }
+
+            options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */ *',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+
+            let res = '';
+            try {
+                res = await fetch('/playlist/createNewPlaylist', options);
+                res = await res.json();
+                resultMessage.innerHTML = res.msg;
+                console.log(res);
+            } catch (ex) {
+                console.log(ex);
+                resultMessage.innerHTML = ex;
+            }
+
+            setTimeout(function() {
+                location.assign('/playlist');
+            }, 1000);
+
+        }
+
+
+        async function renameThisPlaylist() {
+            var playlistNewName = document.getElementById("newName").value;
+            $('#RenamePlaylist').modal('hide');
+
+            var data = {
+                playlistId,
+                playlistNewName,
+            }
+
+            options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */ *',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+
+            let res = '';
+            try {
+                res = await fetch('/playlist/renamePlaylist', options);
+                res = await res.json();
+                resultMessage.innerHTML = res.msg;
+                console.log(res);
+            } catch (ex) {
+                console.log(ex);
+                resultMessage.innerHTML = ex;
+            }
+
+            playlistId = null;
+
+            setTimeout(function() {
+                location.assign('/playlist');
+            }, 1000);
+
+        }
+    </script>
+
+
+    <%- include('./partial/footer.ejs'); %>

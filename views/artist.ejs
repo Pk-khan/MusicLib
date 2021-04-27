@@ -1,0 +1,30 @@
+<%- include('./partial/header.ejs'); %>
+
+
+    <h1 class="display-5 whiteColor center">
+        <%= data.text %>
+    </h1>
+
+    <br/>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 center " style=" margin-left:5%">
+                <% for(var i = 0; i<data.artists.length; i++)  {   %>
+
+                    <div class="card-body albumcardView" style="margin-left:4% ">
+                        <p class="fs-5" style="color:rgb(255, 217, 0)">
+                            <%= data.artists[i].name%>
+                        </p>
+
+                        <a href='/artist/<%= data.artists[i]._id%>'><button type="button" class="btn btn-outline-primary">Albums List</button></a>
+                    </div>
+
+                    <% } %>
+            </div>
+        </div>
+    </div>
+
+
+
+    <%- include('./partial/footer.ejs'); %>

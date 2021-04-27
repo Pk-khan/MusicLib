@@ -1,0 +1,23 @@
+<audio class="fix" id='audio' controls="controls " type="audio/mpeg ">
+</audio>
+
+<script>
+    async function fetchSong(id) {
+
+        var audio = document.getElementById('audio');
+
+        var options = {
+            method: 'GET',
+        }
+        var res = await fetch(`/song/${id}`,options);
+        res = await res.json();
+
+        audio.src = res.songFile;
+        audio.load();
+        audio.play();
+    }
+</script>
+
+</body>
+
+</html>

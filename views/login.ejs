@@ -1,0 +1,86 @@
+<%- include('./partial/header.ejs'); %>
+
+    <link href="/css/register.css" rel="stylesheet" type="text/css">
+
+    <div class="bg-image"></div>
+
+    <div class="bg-text">
+        <div class="container">
+            <div class="row">
+                <div class="col-3">
+                </div>
+                <div class="col-6">
+                    <form id="loginUser">
+
+                        <h1>Login </h1>
+                        <div class="mb-3 ">
+                            <label for="exampleInputEmail1 " class="form-label ">Email address</label>
+                            <input type="email " class="form-control " id="email " name="email" aria-describedby="emailHelp" required>
+                            <div id="emailError" class="font-weight-bold text-warning"></div>
+                        </div>
+                        <div class="mb-3 ">
+                            <label for="exampleInputPassword1 " class="form-label ">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="checkbox" onclick="togglePassword()"> Show Password
+                            <div id="passwordError" class="font-weight-bold text-warning"></div>
+                        </div>
+
+                        <button class="btn btn-primary">Login</button>
+                    </form>
+
+                    <div><br/> Don't have Account? Go to <a href="/register">Sign Up</a>
+                    </div>
+                    <div class="col-3 ">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("loginUser");
+        form.addEventListener("submit", async(event) => {
+            event.preventDefault();
+            var email = form.email.value;
+            var password = form.password.value;
+            var emailError = document.getElementById("emailError");
+            var passwordError = document.getElementById("passwordError");
+            try {
+                var options = {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json, text/plain, */ *',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                }
+                var res = await fetch("/login", options);
+                var result = await res.json();
+                if (result.errors) {
+                    console.log(result.errors);
+                    emailError.textContent = result.errors.email;
+                    passwordError.textContent = result.errors.password;
+                    return;
+                }
+                location.assign('/');
+            } catch (error) {
+                console.log(error);
+            }
+        });
+
+        function togglePassword() {
+            var x = document.getElementById("password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
+
+    </body>
+
+    </html>

@@ -1,0 +1,134 @@
+<%- include('./partial/header.ejs'); %>
+
+    <div id="showLoader">
+
+    </div>
+
+    <br/><br/>
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-3">
+
+            </div>
+            <div class="col-sm-6">
+
+                <form id="uploadSong">
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label whiteColor" class="fw-bold"><span class="material-icons verticalSpanIcon">drive_file_rename_outline</span> Song Name</label>
+                        <input type="text" class="form-control font-weight-bold" id="name" aria-describedby="emailHelp" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label whiteColor"><span class="material-icons verticalSpanIcon"> category</span> Genre</label>
+                        <input type="text" class="form-control font-weight-bold" id="genre" aria-describedby="emailHelp" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label whiteColor"> <span class="material-icons verticalSpanIcon">album</span> Album Name</label> &nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="checkBoxAlbumName" onclick="checkBox()"> &nbsp;
+                        <label for="vehicle1" class="whiteColor"> Same as Song Name</label><br>
+                        <input type="text" class="form-control font-weight-bold" id="album" aria-describedby="emailHelp" required>
+                    </div>
+
+                    <div class="whiteColor"> <span class="material-icons verticalSpanIcon">
+                        audiotrack
+                        </span> Select .mp3 file </div>
+
+                    <input class="whiteColor" type="file" multiple="false" accept=".mp3,audio/*" id="finput" required>
+
+                    <button class="btn btn-primary "> <span class="material-icons verticalSpanIcon">upload</span> Upload </button>
+                </form>
+
+            </div>
+            <div class="col-sm-3 ">
+
+            </div>
+        </div>
+    </div>
+    <br/><br/><br/><br/>
+
+
+    <script>
+        function checkBox() {
+            var checkBoxAlbumName = document.getElementById("checkBoxAlbumName");
+            var album = document.getElementById("album");
+
+            if (checkBoxAlbumName.checked == true) {
+                album.value = document.getElementById("name").value.trim();
+            } else {
+                album.value = '';
+            }
+        }
+
+        var showLoader = document.getElementById("showLoader");
+
+        var img = document.getElementById("finput");
+        var formData;
+        img.addEventListener('change', async function(event) {
+            event.preventDefault();
+            var file = event.target.files[0];
+            formData = await toBase64(file);
+
+        });
+
+            const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+
+        const form = document.getElementById('uploadSong');
+
+        form.addEventListener("submit", async(event) => {
+            event.preventDefault();
+
+            var loader = document.createElement("div");
+            loader.setAttribute("class", "loader center");
+            showLoader.appendChild(loader);
+
+            var resultMessage = document.getElementById("resultMessage");
+
+            var name = document.getElementById("name").value.trim();
+            var genre = document.getElementById("genre").value.trim();
+            var album = document.getElementById("album").value.trim();
+
+            var data = {
+                name,
+                genre,
+                album,
+                'url': formData
+            }
+
+            options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */ *',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+
+            let res = '';
+            try {
+                res = await fetch('/song/upload', options);
+                res = await res.json();
+                resultMessage.innerHTML = res.msg;
+                console.log(res);
+            } catch (ex) {
+                console.log(ex);
+                resultMessage.innerHTML = ex;
+            }
+
+            showLoader.removeChild(showLoader.lastChild);
+
+            setTimeout(function() {
+                resultMessage.innerHTML = '';
+            }, 1000);
+
+        });
+    </script>
+
+
+    <%- include('./partial/footer.ejs'); %>

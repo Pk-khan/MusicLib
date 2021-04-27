@@ -1,0 +1,136 @@
+<%- include('./partial/header.ejs'); %>
+    <div class="row ">
+
+        <div class="col-sm-3">
+        </div>
+
+        <div class="col-sm-9 ">
+            <h1 class="display-6 whiteColor">
+                All Songs
+            </h1>
+
+            <div class="input-group">
+                <input type="search" id='search' class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                <button type="button" class="btn btn-outline-primary">search</button>
+            </div>
+            <br/>
+            <p class="  whiteColor">
+                <%= data.songSearchName %>
+            </p>
+
+            <div class="container ">
+                <div class="row ">
+
+                    <% for( var i = 0; i< data.allSongs.length; i++ )  { %>
+                        <div class="col-sm-3 ">
+                            <div class="carousel-cell">
+                                <div class="card-body cardView">
+                                    <p class="card-title whiteColor center fs-5" style="color:rgb(255, 217, 0)">
+                                        <%= data.allSongs[i].name %>
+                                    </p>
+
+                                    <p class="card-text whiteColor center ">
+                                        <%= data.allSongs[i].artist.name %>
+                                    </p>
+
+                                    <div style="display:inline-flex; margin-left:10% ">
+                                        <button onclick="fetchSong( '<%= data.allSongs[i]._id %>') " class="btn btn-primary "><span  class="material-icons verticalSpanIcon ">
+                                    <div id = 'playStatus' >play_arrow</div></span>
+                               </button> &nbsp;&nbsp;&nbsp;
+                                        <div class="dropdown ">
+                                            <button class="btn btn-primary whiteColor " type="button " data-toggle='dropdown'>
+                                        <span class=" material-icons verticalSpanIcon ">
+                                            more_horiz
+                                            </span></button>
+                                            <ul class="dropdown-menu center ">
+                                                <li class="dropdown-submenu ">
+                                                    <a class="test noUnderline " tabindex="-1 " href="#">Add to playlist <span class="caret "></span></a>
+                                                    <ul class="dropdown-menu center ">
+
+                                                        <% for( var j = 0; j< data.playlists.length; j++ )  { %>
+
+                                                            <li>
+                                                                <button style="background:none;border:none; color:rgb(34, 91, 165); " onclick="addSongIntoPlaylist( '<%= data.playlists[j]._id %>', '<%= data.allSongs[i]._id %>') ">
+                                                                     <%= data.playlists[j].name %>
+                                                                </button>
+                                                            </li>
+
+
+                                                            <% } %>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="whiteColor center ">
+                                        <%= data.allSongs[i].plays %> plays</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% } %>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/><br/><br/>
+
+    <script>
+        $(document).ready(function() {
+            $('.dropdown-submenu a.test').on("click ", function(e) {
+                $(this).next('ul').toggle();
+                e.stopPropagation();
+                e.preventDefault();
+            });
+        });
+        async function addSongIntoPlaylist(playlistId, songId) {
+
+            var resultMessage = document.getElementById('resultMessage');
+
+            var data = {
+                songId,
+                playlistId
+            }
+
+            options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */ *',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+
+            let res = '';
+            try {
+                res = await fetch('/playlist/addSongIntoPlaylist', options);
+                res = await res.json();
+                resultMessage.innerHTML = res.msg;
+                console.log(res);
+            } catch (ex) {
+                console.log(ex);
+                resultMessage.innerHTML = ex;
+            }
+
+            setTimeout(function() {
+                resultMessage.innerHTML = '';
+            }, 1000);
+
+
+        }
+
+
+        var search = document.getElementById("search");
+
+        search.addEventListener('change', async(event) => {
+            var songToBeSearch = search.value;
+            location.assign(`/allsongs/${songToBeSearch}`);
+        });
+    </script>
+
+
+
+
+
+    <%- include('./partial/footer.ejs'); %>

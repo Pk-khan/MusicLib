@@ -1,0 +1,126 @@
+<%- include('./partial/header.ejs'); %>
+
+    <p class="fs-1 text-secondary center">
+        <i class="text-primary">   <%= data.playlist.name %> </i> playlist </p>
+
+    <div class="modal fade" id="removeSong" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Remove Song</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure to Remove this Song
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="removeThisSong()">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 center">
+
+                <table class="table whiteColor">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Song Name</th>
+                            <th scope="col">Remove Song </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <% for(var i = 0; i<data.playlist.songs.length; i++)  {%>
+
+                            <tr>
+                                <th scope="row">
+                                    <%= i+1 %>
+                                </th>
+
+                                <td>
+                                    <button style=" background:none;border:none;color:#007bff;" class="link fs-4" onclick="fetchSong('<%= data.playlist.songs[i]._id %>')">
+                                        <%= data.playlist.songs[i].name %>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" onclick="removeSong( '<%= data.playlist._id %>' , '<%= data.playlist.songs[i]._id %>')">
+                                        <span class="material-icons verticalSpanIcon">
+                                            remove_circle
+                                            </span> Remove
+                                      </button>
+                                </td>
+
+                            </tr>
+                            <% } %>
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var playlistId;
+        var songId;
+
+        resultMessage = document.getElementById("resultMessage");
+
+        async function removeSong(pId, sId) {
+            $('#removeSong').modal('show');
+            playlistId = pId;
+            songId = sId;
+        }
+
+        async function removeThisSong() {
+
+            $('#removeSong').modal('hide');
+
+
+            var data = {
+                playlistId,
+                songId
+            }
+
+            options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */ *',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+
+            let res = '';
+            try {
+                res = await fetch('/playlist/removeSong', options);
+                res = await res.json();
+                resultMessage.innerHTML = res.msg;
+                console.log(res);
+            } catch (ex) {
+                console.log(ex);
+                resultMessage.innerHTML = ex;
+            }
+
+            playlistId = null;
+            songId = null;
+
+            setTimeout(function() {
+                location.assign("/playlist/<%= data.playlist._id %>");
+            }, 1000);
+
+
+        }
+    </script>
+
+
+
+
+
+    <%- include('./partial/footer.ejs'); %>
